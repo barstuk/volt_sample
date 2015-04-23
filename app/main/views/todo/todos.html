@@ -3,29 +3,42 @@ Todos
 <:Body>
 <div class="row">
   <div class="col-md-4">
-    {{ if loaded? }}
-
-    <h1>Todo List</h1>
-    <td><button e-click="bulk_destroy_todo">Remove All</button></td>
+    <h1>{{ store._todos.size }} Todos</h1>
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: {{ percent_complete(store) }}%;">
+        {{ percent_complete(store) }}%
+      </div>
+    </div>
+    {{ if incomplete_todos_size(store) > 0 }}
+    <td><button e-click="bulk_complete_todos(store)">Complete Tasks {{incomplete_todos_size(store)}}</button></td>
+    {{ end }}
+    <td><button e-click="bulk_incomplete_todos(store)">Incomplete Tasks</button></td>
+    <td><button e-click="bulk_destroy_completed_todos(store)">Remove Completed</button></td>
+    <td><button e-click="bulk_destroy_todos(store)">Remove All</button></td>
     <table class="todo-table">
       {{store._todos.each_with_index do |todo, index| }}
-      <!-- Use params to store the current index -->
-      <tr
-      e-click="params._index = index"
-      class="{{ if params._index.to_i == index }}selected{{ end }}"
-      >
-      <td><input type="checkbox" checked="{{ todo._completed }}" /></td>
-      <td class="{{ if todo._completed }}complete{{ end }}">{{ todo._name }}</td>
-      <td><button e-click="remove_todo(todo)">X</button></td>
-    </tr>
-    {{ end }}
-  </table>
+      <tr e-click="params._index = index" class="{{ if params._index.to_i == index }}selected{{ end }}" >
+        <td><input type="checkbox" checked="{{ todo._completed }}" /></td>
+        <td class="{{ if todo._completed }}complete{{ end }}">{{ todo._name }}</td>
+        <td><button e-click="remove_todo(todo, index)">X</button></td>
+      </tr>
+      {{ end }}
+    </table>
 
-  <form e-submit="add_todo" role="form">
-    <div class="form-group">
-    <:fields:text label="Todo" value="{{ _name }}" />
-   </div>
- </form>
- {{ end }}
-</div>
+    <form e-submit="add_todo" role="form">
+      <div class="form-group">
+        <:fields:text label="Todo" value="{{ _name }}" />
+      </div>
+    </form>
+  </div>
+  <div class="col-md-6">
+    {{ if current_todo }}
+    <form e-submit="add_description" role="form">
+      <h1>{{ current_todo._name }}</h1>
+      <div class="form-group">
+        <:fields:textarea label="Description" value="{{ current_todo._description }}" />
+      </div>
+    </form>
+    {{ end }}
+  </div>
 </div>
