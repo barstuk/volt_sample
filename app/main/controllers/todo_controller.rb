@@ -3,7 +3,6 @@ module Main
   class TodoController < Volt::ModelController
 
     def add_todo
-      debugger
       model.save! do
         params._index = `$('.todo-table tr').size() - 1`
         flash._successes.clear
